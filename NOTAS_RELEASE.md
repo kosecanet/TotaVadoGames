@@ -1,7 +1,3 @@
 # Cambios de esta versión
 
-- Todos los nombres de juegos y textos en castellano.
-- Estilo más parecido al original: marcador en pastilla blanca a la izquierda, botón SALIR a la derecha, contornos negros y colores azul/salmón.
-- Nueva mascota (un vado con ojos) que explica cada juego al empezar.
-- Rehechos como el original: Sumo (luchadores), Baloncesto (lanzas a la canasta del otro), Lanzaespadas (dianas en las esquinas), Batalla de ranas (saltar entre nenúfares), Dedos rápidos (cúpula y diamante), Atasco (cruzar la carretera), Bambú shuriken, Festival explosivo (cohetes contra el dragón), Maestría del arco, Saqueador (tirar del dinero), Penaltis (deslizar para chutar y para lanzarse), Vóley cangrejo (visto desde arriba).
-- Nuevo aspecto: Tres en raya, Hockey de aire, Damas, Pimpón y Pesca injusta.
+- Pimpón rehecho como un ping pong de verdad: mesa azul con red, palas con mango de madera y goma, la pelota vuela con altura y sombra, tiene que botar una vez en cada lado, la red la frena, y deslizar la pala de lado da efecto a la bola. Partidas a 7 puntos (con diferencia de 2) y el saque cambia cada 2 puntos.

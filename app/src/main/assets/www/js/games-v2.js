@@ -272,3 +272,50 @@ redef('crabvolley',()=>{
   };
 },{help:'Mueve tu cangrejo bajo la pelota. Desliza al golpear para darle efecto'});
 
+
+/* ---- PIMPÓN realista: palas con mango, bote en la mesa, red y efecto ---- */
+redef('pong',()=>{
+  let x0,x1,y0,y1,ball,pad,sc=[0,0],server=0,h=-1,bounces=0,state='serve',msg='',msgT=0,points=0;
+  const G=1500,NETZ=16,PR=34,PTS=7;
+  const onTable=(x,y)=>x>=x0&&x<=x1&&y>=y0&&y<=y1;
+  function newServe(){const p=server;ball={x:pad[p].x,y:p==0?y1+20:y0-20,z:45,vx:0,vy:0,vz:0,spin:0};state='serve';h=-1;bounces=0;}
+  function point(w,m){if(state=='point')return;sc[w]++;points++;msg=m;msgT=1.2;state='point';beep(w?330:660,.2,'triangle',.08);buzz(50);
+    if(points%2==0)server^=1;if(sc[w]>=PTS&&sc[w]-sc[1-w]>=2){later(()=>endRound(w,`${sc[0]} – ${sc[1]}`),900);}}
+  function hit(p){const q=pad[p],b=ball,dir=p==0?-1:1,sp=clamp(620+Math.abs(q.vy)*.35,600,1250);
+    const ly=H/2+dir*(H/2-y0)*rnd(.35,.75),t=Math.abs(ly-b.y)/sp;b.vy=dir*sp;
+    b.vx=clamp((b.x-q.x)*5+q.vx*.25,-420,420);b.spin=clamp(q.vx*.9,-700,700);b.vz=G*t/2-b.z/t;h=p;bounces=0;state='rally';beep(520+Math.random()*80,.04,'square',.07);buzz(15);}
+  return{
+    score:()=>sc,_s:()=>({ball,state,h,bounces,sc,pad}),
+    init(){x0=W*.12;x1=W*.88;y0=H*.13;y1=H*.87;pad=[{x:W/2,y:H-60,tx:W/2,ty:H-60,vx:0,vy:0,id:null},{x:W/2,y:60,tx:W/2,ty:60,vx:0,vy:0,id:null}];newServe();},
+    down(id,x,y){const p=sideOf(y),q=pad[p];q.id=id;this.move(id,x,y);},
+    move(id,x,y){for(let p=0;p<2;p++){const q=pad[p];if(q.id!==id)continue;q.tx=clamp(x,20,W-20);q.ty=p==0?clamp(y-36,H/2+40,H-30):clamp(y+36,30,H/2-40);}},
+    up(id){for(const q of pad)if(q.id===id)q.id=null;},
+    update(dt){for(const q of pad){const nx=q.x+(q.tx-q.x)*Math.min(1,dt*25),ny=q.y+(q.ty-q.y)*Math.min(1,dt*25);q.vx=q.vx*.6+((nx-q.x)/dt)*.4;q.vy=q.vy*.6+((ny-q.y)/dt)*.4;q.x=nx;q.y=ny;}
+      if(state=='point'){msgT-=dt;if(msgT<=0&&!ended)newServe();return;}
+      const b=ball;
+      if(state=='serve'){const q=pad[server];b.x+=(q.x-b.x)*Math.min(1,dt*6);b.z=45+Math.sin(performance.now()/200)*8;
+        const dir=server==0?-1:1;if(Math.hypot(b.x-q.x,b.y-q.y)<PR+10&&q.vy*dir>120)hit(server);
+        return;}
+      const N=3,st=dt/N;
+      for(let s=0;s<N;s++){const py=b.y;b.vx+=b.spin*st;b.spin*=Math.pow(.3,st);b.x+=b.vx*st;b.y+=b.vy*st;b.vz-=G*st;b.z+=b.vz*st;
+        if((py-H/2)*(b.y-H/2)<0&&b.z<NETZ){b.vy*=-.25;b.vx*=.3;b.y=H/2+(py>H/2?1:-1)*4;beep(160,.06,'sine',.06);}
+        if(b.z<=0){b.z=0;if(onTable(b.x,b.y)){const side=b.y>H/2?0:1;b.vz=Math.abs(b.vz)*.82;beep(900,.03,'sine',.06);
+            if(side==h){point(1-h,'¡Ha botado en tu lado!');return;}bounces++;if(bounces>=2){point(h,'¡Dos botes!');return;}}
+          else{if(bounces>=1)point(h,'¡Punto!');else point(1-h,'¡Fuera!');return;}}
+        for(let p=0;p<2;p++){const q=pad[p],toward=p==0?b.vy>0:b.vy<0;if(p!==h&&toward&&bounces>=1&&b.z<110&&Math.hypot(b.x-q.x,b.y-q.y)<PR+12){hit(p);break;}}}},
+    draw(){ctx.fillStyle='#3d3b24';ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='rgba(0,0,0,.25)';rrect(x0+8,y0+10,x1-x0,y1-y0,6);ctx.fill();ctx.fillStyle=INK;rrect(x0-6,y0-6,x1-x0+12,y1-y0+12,8);ctx.fill();
+      ctx.fillStyle='#2f6f9a';ctx.fillRect(x0,y0,x1-x0,y1-y0);ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.strokeRect(x0+3,y0+3,x1-x0-6,y1-y0-6);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W/2,y0);ctx.lineTo(W/2,y1);ctx.stroke();
+      ctx.fillStyle=INK;ctx.fillRect(x0-18,H/2-5,x1-x0+36,10);ctx.fillStyle='#e9e4d0';ctx.fillRect(x0-14,H/2-2,x1-x0+28,4);circle(x0-16,H/2,7,INK);circle(x1+16,H/2,7,INK);
+      const b=ball,r=8*(1+b.z/200);ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(b.x+b.z*.3,b.y+b.z*.15,8,6,0,0,7);ctx.fill();
+      const paddle=(q,p)=>{const dir=p==0?1:-1,tilt=clamp(q.vx/1500,-.5,.5);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(tilt+(p?Math.PI:0));
+        ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(6,10,PR,PR*1.05,0,0,7);ctx.fill();
+        ctx.fillStyle=INK;rrect(-10,PR*.7,20,PR*1.25,7);ctx.fill();ctx.fillStyle='#c9925a';rrect(-6,PR*.75,12,PR*1.15,5);ctx.fill();ctx.fillStyle='#a8743f';ctx.fillRect(-6,PR*1.15,12,4);ctx.fillRect(-6,PR*1.4,12,4);
+        ctx.fillStyle=INK;ctx.beginPath();ctx.ellipse(0,0,PR+4,PR*1.05+4,0,0,7);ctx.fill();ctx.fillStyle='#e8d2b0';ctx.beginPath();ctx.ellipse(0,0,PR+1,PR*1.05+1,0,0,7);ctx.fill();
+        ctx.fillStyle=COL[p];ctx.beginPath();ctx.ellipse(0,0,PR-2,PR*1.05-2,0,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.12)';for(let i=-3;i<=3;i++)for(let k=-3;k<=3;k++)if(i*i+k*k<10)circle(i*8,k*8,1.6,'rgba(0,0,0,.18)');ctx.restore();};
+      paddle(pad[1],1);if(b.z<60)paddle(pad[0],0);
+      circle(b.x,b.y,r+2.5,INK);circle(b.x,b.y,r,'#fff');circle(b.x-r*.3,b.y-r*.3,r*.3,'#e8e8e8');
+      if(b.z>=60)paddle(pad[0],0);
+      for(let p=0;p<2;p++)inHalf(p,()=>{if(state=='point'&&msgT>0)TS(msg,W/2,H*.7,30,'#ffe066');else if(state=='serve'&&server==p)TS('¡Sacas tú! Mueve la pala hacia la pelota',W/2,H*.7,17,'#fff');});}
+  };
+},{help:'Mueve la pala con el dedo. La pelota tiene que botar una vez en cada lado. Desliza de lado para dar efecto',cd:true});
