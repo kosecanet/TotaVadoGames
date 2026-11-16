@@ -1,8 +1,11 @@
 name: Compilar APK y publicar Release
 
+# - push a main: solo compila (comprueba que todo va bien), NO publica
+# - tag "publicar-*" o "Run workflow" a mano: compila y publica la Release (la app se autoactualiza)
 on:
   push:
     branches: [main, master]
+    tags: ['publicar-*']
   workflow_dispatch:
 
 permissions:
@@ -49,12 +52,11 @@ jobs:
           path: out/*.apk
 
       - name: Publicar Release
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/publicar-')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: TotaVado Games 1.0.${{ github.run_number }}
-          body: |
-            APK listo para instalar en Android (sin anuncios).
-            Commit: ${{ github.sha }}
+          body_path: NOTAS_RELEASE.md
           files: out/*.apk
           make_latest: true
