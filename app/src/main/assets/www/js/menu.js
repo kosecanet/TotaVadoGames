@@ -12,7 +12,19 @@ const NEW=new Set(['oops','guessanimal']);
 GAMES.sort((a,b)=>{const ia=ORDER.indexOf(a.id),ib=ORDER.indexOf(b.id);return(ia<0?999:ia)-(ib<0?999:ib);});
 
 function shade(hex,f){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;r=Math.round(r*(1+f));g=Math.round(g*(1+f));b=Math.round(b*(1+f));return`rgb(${clamp(r,0,255)},${clamp(g,0,255)},${clamp(b,0,255)})`;}
-$('#grid').innerHTML=GAMES.map(g=>`<div class="tile" data-id="${g.id}" style="--c:${g.color};--b:${shade(g.color,-.45)}"><div class="band"></div><div class="ic">${g.emoji}</div>${g.solo?'<div class="solo">1P</div>':''}${NEW.has(g.id)?'<div class="new">¡NUEVO!</div>':''}<div class="t">${g.name}</div></div>`).join('');
+// Nivel de dificultad: 1 = menores de 5, 2 = menores de 10, 3 = todos (los demás no listados = 2)
+const LVL={tug:1,fast:1,mole:1,hippo:1,paint:1,stars:1,sumo:1,hockey:1,turtle:1,memory:1,reflex:1,findmatch:1,sashimi:1,frogs:1,fishing:1,traffic:1,
+  icepeaks:1,bamboo:1,swords:1,target:1,crash:1,rps:1,brainrot:1,animalstack:1,wheelie:1,stampede:1,basket:1,bowling:1,minisoccer:1,slap:1,knife:1,duel:1,
+  tilematch:1,fruit:1,mazepaint:1,
+  chess:3,backgammon:3,yazy:3,triple:3,uttt:3,sudoku:3,solitaire:3,numbers:3,slide:3};
+const lvlOf=g=>LVL[g.id]||2;
+let AGE=load('tv_age',3);
+window.ageOK=g=>lvlOf(g)<=AGE;
+function renderGrid(){const list=GAMES.filter(ageOK);
+  $('#grid').innerHTML=list.map(g=>`<div class="tile" data-id="${g.id}" style="--c:${g.color};--b:${shade(g.color,-.45)}"><div class="band"></div><div class="ic">${g.emoji}</div>${g.solo?'<div class="solo">1P</div>':''}${NEW.has(g.id)?'<div class="new">¡NUEVO!</div>':''}<div class="t">${g.name}</div></div>`).join('');
+  document.querySelectorAll('#ages button').forEach(b=>b.classList.toggle('on',+b.dataset.a==AGE));$('#grid').scrollTop=0;}
+renderGrid();
+$('#ages').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;AGE=+b.dataset.a;save('tv_age',AGE);renderGrid();beep(600,.04);});
 $('#grid').addEventListener('click',e=>{const c=e.target.closest('.tile');if(c){wins=[0,0];champ=null;start(c.dataset.id);}});
 $('#tourBtn').addEventListener('click',champStart);
 $('#nGames').textContent=GAMES.length;

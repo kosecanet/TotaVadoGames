@@ -110,7 +110,7 @@ function endRound(w,msg){
   }else{if(w>=0)wins[w]++;
     setTimeout(()=>showOver(w,msg,`Azul ${wins[0]} – ${wins[1]} Rojo`,[{t:'Revancha',fn:()=>start(G.def.id)},{t:'Menú',fn:toMenu}]),500);}
 }
-function champStart(){const ids=shuffle(GAMES.filter(g=>!g.solo).map(g=>g.id)).slice(0,5);champ={list:ids,idx:0,pts:[0,0]};start(ids[0]);}
+function champStart(){const ids=shuffle(GAMES.filter(g=>!g.solo&&(!window.ageOK||ageOK(g))).map(g=>g.id)).slice(0,5);champ={list:ids,idx:0,pts:[0,0]};start(ids[0]);}
 function champEnd(){const p=champ.pts,w=p[0]==p[1]?-1:p[0]>p[1]?0:1;
   const titles=w<0?['🤝 ¡Empate!','🤝 ¡Empate!']:[w==0?'🏆 ¡CAMPEÓN!':'Rojo es el campeón',w==1?'🏆 ¡CAMPEÓN!':'Azul es el campeón'];
   showOver(w,'Final del torneo',`Azul ${p[0]} – ${p[1]} Rojo`,[{t:'Otro torneo',fn:champStart},{t:'Menú',fn:toMenu}],titles);}

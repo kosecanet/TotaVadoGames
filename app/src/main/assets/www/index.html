@@ -14,6 +14,9 @@ html,body{height:100%;overflow:hidden;background:#eef4fb;font-family:Lilita,syst
 .sq svg{width:32px;height:32px}
 #brand{flex:1;height:56px;border-radius:18px;background:#4d3b5c;box-shadow:0 5px 0 #382a44;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:23px;letter-spacing:.3px;white-space:nowrap;overflow:hidden}
 #brand svg{width:40px;height:40px;flex:none;border-radius:9px}
+#ages{flex:none;display:flex;gap:8px;padding:0 12px 10px;background:#d6e9fa}
+#ages button{flex:1;padding:9px 4px;font-size:15px;border-radius:14px;background:#fff;color:#4d3b5c;box-shadow:0 4px 0 #b9cfe3;white-space:nowrap}
+#ages button.on{background:#4d3b5c;color:#fff;box-shadow:0 4px 0 #382a44}
 #upd{display:none;flex:none;align-items:center;gap:10px;margin:10px 12px 0;padding:10px 12px;border-radius:16px;background:#43a95b;box-shadow:0 4px 0 #2f7d41;font-size:18px}
 #upd span{flex:1}#upd button{padding:9px 14px;font-size:17px;background:#fff;color:#2f7d41;box-shadow:0 3px 0 #cfd8dc}
 #grid{flex:1;overflow-y:auto;touch-action:pan-y;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 12px 120px;align-content:start}
@@ -60,6 +63,7 @@ button.alt{background:#64809a;box-shadow:0 4px 0 #4a6178}
       TotaVado Games
     </div>
   </div>
+  <div id="ages"><button data-a="1">👶 Menos de 5</button><button data-a="2">🧒 Menos de 10</button><button data-a="3">👨‍👩‍👧 Todos</button></div>
   <div id="upd"><span id="updTxt"></span><button id="updBtn"></button></div>
   <div id="grid"></div>
   <div id="bottombar">
