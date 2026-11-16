@@ -6,7 +6,7 @@ def('fast','Dedos rápidos','💎','#5a4068',()=>{
   const ITEMS=['🍎','⭐','🎈','🍩','🔔','🧸','⚽','🍀','🔷','💍'];
   let cur=null,t=0,next=1,sc=[0,0],nonD=0,lock=0,flash=null;const PTS=5;
   function nextItem(){if(nonD>=2&&Math.random()<.35){cur='💎';nonD=0;next=1.1;}else{cur=pick(ITEMS);nonD++;next=rnd(.55,1);}t=0;}
-  return{
+  return{score:()=>sc,
     init(){nextItem();},
     update(dt){if(lock>0){lock-=dt;if(lock<=0)nextItem();return;}t+=dt;if(t>=next)nextItem();},
     down(id,x,y,live){if(!live||lock>0)return;const p=sideOf(y);let w;
@@ -26,7 +26,7 @@ def('fast','Dedos rápidos','💎','#5a4068',()=>{
 def('mole','Mazatopos','🐹','#8a4b2e',()=>{
   let holes=[[],[]],sc=[0,0],t=0,spawn=0,hs,gx,gy;const TL=30;
   const geo=()=>{hs=Math.min(W*.27,H*.125);gx=W/2-hs*1.5;gy=H/2+H*.07;};
-  return{
+  return{score:()=>sc,
     init(){geo();for(let p=0;p<2;p++)holes[p]=Array.from({length:9},()=>({k:null,t:0,hit:0}));},resize:geo,
     update(dt){t+=dt;spawn-=dt;
       if(spawn<=0){spawn=rnd(.35,.7);const i=ri(0,8),k=Math.random()<.18?'💣':'🐹',life=rnd(.7,1.1);for(let p=0;p<2;p++)if(!holes[p][i].k)holes[p][i]={k,t:life,hit:0};}
@@ -69,7 +69,7 @@ def('tanks','Tanques','💥','#e8a93a',()=>{
   function hitWall(x,y,r){if(x<r||x>W-r||y<ch+r||y>H-ch-r)return true;for(const[wx,wy,ww,wh]of walls)if(x>wx-r&&x<wx+ww+r&&y>wy-r&&y<wy+wh+r)return true;return false;}
   function fire(p){if(cool[p]>0||tk[p].dead||ended)return;if(bul.filter(b=>b.p==p).length>=3)return;cool[p]=.35;const k=tk[p];
     bul.push({x:k.x+Math.cos(k.a)*TR*1.5,y:k.y+Math.sin(k.a)*TR*1.5,vx:Math.cos(k.a)*330,vy:Math.sin(k.a)*330,p,life:4});beep(300,.06,'square',.05);}
-  return{
+  return{score:()=>sc,
     init(){ch=Math.max(80,H*.11);const t=ch,b=H-ch,h=b-t;walls=[[W*.12,t+h*.3,W*.28,16],[W*.6,t+h*.3,W*.28,16],[W*.12,t+h*.7-16,W*.28,16],[W*.6,t+h*.7-16,W*.28,16],[W*.5-8,t+h*.42,16,h*.16]];reset();},
     down(id,x,y,live){const p=y>H-ch?0:y<ch?1:-1;if(p<0||!live)return;const l=local(p,x,y);const b=l.x<W/2?'mv':'fire';held.set(id,{p,b});if(b=='fire')fire(p);},
     up(id){held.delete(id);},
@@ -126,7 +126,7 @@ def('darts','Darts','🎯','#b5543a',()=>{
   function score(x,y){const dx=x-cx,dy=y-cy,d=Math.hypot(dx,dy)/R;if(d>1)return 0;if(d<.07)return 50;if(d<.15)return 25;let a=Math.atan2(dx,-dy)*180/Math.PI;a=(a+360+9)%360;const n=NUM[Math.floor(a/18)%20];if(d>.55&&d<.63)return n*3;if(d>.92)return n*2;return n;}
   const aim=()=>{const k=1+round*.25;return{x:cx+R*.9*Math.sin(t*1.9*k),y:cy+R*.9*Math.sin(t*1.33*k+1)};};
   return{
-    init(){cx=W/2;cy=H/2;R=Math.min(W*.44,H*.24);},
+    score:()=>sc,init(){cx=W/2;cy=H/2;R=Math.min(W*.44,H*.24);},
     update(dt){t+=dt;if(lock>0){lock-=dt;if(lock<=0){darts=[];thrown=0;turn^=1;if(turn==0)round++;
       if(round>=ROUNDS){const w=sc[0]==sc[1]?-1:sc[0]>sc[1]?0:1;endRound(w,`${sc[0]} – ${sc[1]} puntos`);}}}},
     down(id,x,y,live){if(!live||lock>0||sideOf(y)!=turn)return;const a=aim(),lx=a.x+rnd(-5,5),ly=a.y+rnd(-5,5),pts=score(lx,ly);
@@ -152,7 +152,7 @@ def('reflex','Reflex race','👀','#43305e',()=>{
   function nq(){items=shuffle(POOL.slice()).slice(0,N);target=pick(items);for(let p=0;p<2;p++)lay[p]=shuffle(items.slice());lock=[0,0];win=-1;}
   const geo=()=>{c=Math.min(W/4.5,H*.1);};
   const cp=i=>({x:W/2+(i%4-1.5)*c*1.08,y:H*.74+(Math.floor(i/4)-.5)*c*1.08});
-  return{
+  return{score:()=>sc,
     init(){geo();nq();},resize:geo,
     update(dt){for(let p=0;p<2;p++)if(lock[p]>0)lock[p]-=dt;if(wait>0){wait-=dt;if(wait<=0){const m=Math.max(...sc);if(m>=PTS)endRound(sc[0]>sc[1]?0:1,`${sc[0]} – ${sc[1]}`);else nq();}}},
     down(id,x,y,live){if(!live||wait>0)return;const p=sideOf(y);if(lock[p]>0)return;const l=local(p,x,y);
@@ -172,7 +172,7 @@ def('reflex','Reflex race','👀','#43305e',()=>{
 def('slap','Golpe de mano','✋','#8a5aa0',()=>{
   let att=0,ph='ready',t=0,sc=[0,0],msg='',st=0;const PTS=5,STRIKE=.26;
   function point(w,m){sc[w]++;msg=m;ph='res';t=0;beep(w==att?300:800,.15,'square',.07);buzz(60);if(sc[w]>=PTS)later(()=>endRound(w,`${sc[0]} – ${sc[1]}`),900);}
-  return{
+  return{score:()=>sc,
     update(dt){t+=dt;if(ph=='ready'&&t>5)point(1-att,'¡El atacante tardó demasiado!');
       else if(ph=='strike'&&t>=STRIKE){point(att,'¡Golpe!');}
       else if(ph=='res'&&t>1.2&&Math.max(...sc)<PTS){att^=1;ph='ready';t=0;}},
@@ -243,7 +243,7 @@ def('findmatch','Find match','🔍','#e85b52',()=>{
     for(let p=0;p<2;p++){const it=shuffle(sets[p]);plates[p]=it.map((e,i)=>{const ang=i==0?0:(i-1)/5*Math.PI*2+rnd(-.2,.2),d=i==0?0:Rp*.6;return{e,x:W/2+Math.cos(ang)*d,y:H*.745+Math.sin(ang)*d,s:Rp*rnd(.3,.42),rot:rnd(-.6,.6)};});}
     lock=[0,0];win=-1;}
   return{
-    init(){Rp=Math.min(W*.42,H*.19);nq();},
+    score:()=>sc,init(){Rp=Math.min(W*.42,H*.19);nq();},
     update(dt){for(let p=0;p<2;p++)if(lock[p]>0)lock[p]-=dt;if(wait>0){wait-=dt;if(wait<=0){if(Math.max(...sc)>=PTS)endRound(sc[0]>sc[1]?0:1,`${sc[0]} – ${sc[1]}`);else nq();}}},
     down(id,x,y,live){if(!live||wait>0)return;const p=sideOf(y);if(lock[p]>0)return;const l=local(p,x,y);
       let best=null,bd=1e9;for(const q of plates[p]){const d=Math.hypot(l.x-q.x,l.y-q.y);if(d<bd){bd=d;best=q;}}if(!best||bd>Rp*.32)return;

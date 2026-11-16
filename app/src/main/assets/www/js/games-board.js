@@ -5,7 +5,7 @@
 def('rps','Piedra, papel o tijera','✌️','#3aa64a',()=>{
   const O=['✊','✋','✌️'],NM=['Piedra','Papel','Tijera'];let ch=[null,null],sc=[0,0],ph='pick',t=0,res=-1;const PTS=3;
   const bs=()=>Math.min(W*.26,H*.12),bx=i=>W/2+(i-1)*W*.3-bs()/2,by=()=>H*.8-bs()/2;
-  return{
+  return{score:()=>sc,
     update(dt){if(ph=='show'){t+=dt;if(t>1.7){if(Math.max(...sc)>=PTS)endRound(sc[0]>sc[1]?0:1,`${sc[0]} – ${sc[1]}`);else{ch=[null,null];ph='pick';}}}},
     down(id,x,y,live){if(!live||ph!='pick')return;const p=sideOf(y),l=local(p,x,y);if(ch[p]!=null)return;
       for(let i=0;i<3;i++)if(inR(l,bx(i),by(),bs(),bs())){ch[p]=i;beep(500,.05,'square',.05);}
@@ -23,7 +23,7 @@ def('memory','Memoria','🃏','#a5573a',()=>{
   const POOL=['🐟','🐶','🐱','🦊','🐼','🐸','🦁','🐵','🐔','🐙','🦋','🐞','🐢','🦀'];
   let cards,turn=0,sel=[],wait=0,sc=[0,0],cs,ox,oy;const C=4,R=5;
   const geo=()=>{cs=Math.min(W*.94/C,H*.6/R);ox=(W-cs*C)/2;oy=(H-cs*R)/2;};
-  return{
+  return{score:()=>sc,
     init(){geo();const e=shuffle(POOL.slice()).slice(0,C*R/2);cards=shuffle([...e,...e]).map(x=>({e:x,open:false,own:-1}));},resize:geo,
     update(dt){if(wait>0){wait-=dt;if(wait<=0){for(const i of sel)cards[i].open=false;sel=[];turn^=1;}}},
     down(id,x,y){if(wait>0||sel.length>=2)return;const c=Math.floor((x-ox)/cs),r=Math.floor((y-oy)/cs);if(c<0||c>=C||r<0||r>=R)return;const i=r*C+c,k=cards[i];if(k.open||k.own>=0)return;
@@ -61,10 +61,10 @@ def('checkers','Damas','⚪','#1f8fb8',()=>{
       if(mv.cap&&!prom&&caps(r,k).length){forced=[r,k];sel=[r,k];moves=caps(r,k);return;}
       forced=null;sel=null;moves=[];turn^=1;
       if(!hasMoves(turn)){const w=1-turn;later(()=>endRound(w,'¡Sin movimientos para el rival!'),500);}},
-    draw(){halves();ctx.fillStyle='#5b3a1c';rrect(ox-8,oy-8,s+16,s+16,12);ctx.fill();
-      for(let r=0;r<8;r++)for(let k=0;k<8;k++){ctx.fillStyle=(r+k)%2?'#a0663a':'#f2d7a6';ctx.fillRect(ox+k*c,oy+r*c,c,c);}
+    draw(){ctx.fillStyle='#d98d74';ctx.fillRect(0,0,W,H);ctx.fillStyle=INK;rrect(ox-10,oy-10,s+20,s+20,8);ctx.fill();
+      for(let r=0;r<8;r++)for(let k=0;k<8;k++){ctx.fillStyle=(r+k)%2?'#6e4a3a':'#f4f1ea';ctx.fillRect(ox+k*c,oy+r*c,c,c);}
       if(sel){ctx.fillStyle='rgba(255,230,0,.45)';ctx.fillRect(ox+sel[1]*c,oy+sel[0]*c,c,c);for(const m of moves)circle(ox+(m.c+.5)*c,oy+(m.r+.5)*c,c*.16,'rgba(255,255,255,.8)');}
-      for(let r=0;r<8;r++)for(let k=0;k<8;k++){const pc=b[r][k];if(!pc)continue;const x=ox+(k+.5)*c,y=oy+(r+.5)*c;circle(x,y+3,c*.4,'rgba(0,0,0,.35)');circle(x,y,c*.4,COL[pc.p]);ring(x,y,c*.28,'rgba(255,255,255,.5)',3);if(pc.k)E('👑',x,y,c*.4,pc.p?Math.PI:0);}
+      for(let r=0;r<8;r++)for(let k=0;k<8;k++){const pc=b[r][k];if(!pc)continue;const x=ox+(k+.5)*c,y=oy+(r+.5)*c;circle(x,y+3,c*.4,'rgba(0,0,0,.35)');circle(x,y,c*.4,INK);circle(x,y,c*.33,COL[pc.p]);ring(x,y,c*.2,'rgba(255,255,255,.45)',3);if(pc.k)E('👑',x,y,c*.4,pc.p?Math.PI:0);}
       turnLabels(turn,H/2+s/2+(H/2-s/2)/2,forced?'¡Sigue comiendo!':'¡Tu turno!');}
   };
 },{cd:false});

@@ -42,7 +42,7 @@ function clueRace(data,bg){return()=>{
   let items,target,lay=[[],[]],sc=[0,0],lock=[0,0],wait=0,win=-1,c;const PTS=5,N=9;
   function nq(){items=shuffle(data.slice()).slice(0,N);target=pick(items);for(let p=0;p<2;p++)lay[p]=shuffle(items.slice());lock=[0,0];win=-1;}
   const geo=()=>{c=Math.min(W/3.6,H*.105);};const cp=i=>({x:W/2+(i%3-1)*c*1.08,y:H*.77+(Math.floor(i/3)-1)*c*1.08});
-  return{init(){geo();nq();},resize:geo,
+  return{score:()=>sc,init(){geo();nq();},resize:geo,
     update(dt){for(let p=0;p<2;p++)if(lock[p]>0)lock[p]-=dt;if(wait>0){wait-=dt;if(wait<=0){if(Math.max(...sc)>=PTS)endRound(sc[0]>sc[1]?0:1,`${sc[0]} – ${sc[1]}`);else nq();}}},
     down(id,x,y,live){if(!live||wait>0)return;const p=sideOf(y);if(lock[p]>0)return;const l=local(p,x,y);
       for(let i=0;i<N;i++){const q=cp(i);if(Math.abs(l.x-q.x)<c/2&&Math.abs(l.y-q.y)<c/2){if(lay[p][i]==target){sc[p]++;win=p;wait=1.2;beep(900,.1,'sine',.1);}else{lock[p]=1;beep(150,.2,'sawtooth',.06);buzz(50);}return;}}},
@@ -62,7 +62,7 @@ def('triple','Triple','🔷','#4b2f7a',()=>{
   function deal(){const all=[];for(let s=0;s<3;s++)for(let c=0;c<3;c++)for(let n=1;n<4;n++)all.push({s,c,n});do cards=shuffle(all).slice(0,9);while(!hasSet(cards));sel=[[],[]];lock=[0,0];win=-1;}
   const geo=()=>{cw=Math.min(W*.3,H*.15*1.4);ch=Math.min(H*.12,cw*.62);};const cp=i=>({x:W/2+(i%3-1)*cw*1.06-cw/2,y:H*.6+Math.floor(i/3)*ch*1.1});
   function shape(x,y,s,c,r){ctx.fillStyle=c;ctx.beginPath();if(s==0)ctx.arc(x,y,r,0,7);else if(s==1){ctx.moveTo(x,y-r);ctx.lineTo(x+r,y+r*.8);ctx.lineTo(x-r,y+r*.8);ctx.closePath();}else ctx.rect(x-r*.85,y-r*.85,r*1.7,r*1.7);ctx.fill();}
-  return{init(){geo();deal();},resize:geo,
+  return{score:()=>sc,init(){geo();deal();},resize:geo,
     update(dt){for(let p=0;p<2;p++)if(lock[p]>0)lock[p]-=dt;if(wait>0){wait-=dt;if(wait<=0){if(Math.max(...sc)>=PTS)endRound(sc[0]>sc[1]?0:1,`${sc[0]} – ${sc[1]}`);else deal();}}},
     down(id,x,y,live){if(!live||wait>0)return;const p=sideOf(y);if(lock[p]>0)return;const l=local(p,x,y);
       for(let i=0;i<9;i++){const q=cp(i);if(inR(l,q.x,q.y,cw,ch)){const s=sel[p],k=s.indexOf(i);if(k>=0)s.splice(k,1);else s.push(i);beep(500,.03);
@@ -128,7 +128,7 @@ def('crash','Crash it','🚙','#c5604e',()=>{
 def('throw','Throw','⛄','#2f66b8',()=>{
   let px=[0,0],tx=[0,0],balls=[],walls,sc=[0,0],cool=[0,0],hit=[0,0];const PTS=5;
   const py=p=>p==0?H-70:70;
-  return{
+  return{score:()=>sc,
     init(){px=[W/2,W/2];tx=[W/2,W/2];walls=[0,1,2].map(i=>({x:W*(.2+i*.3),w:W*.18,dir:i%2?1:-1}));},
     down(id,x,y){const p=sideOf(y);tx[p]=clamp(x,24,W-24);},move(id,x,y){const p=sideOf(y);tx[p]=clamp(x,24,W-24);},
     up(id,x,y){const p=sideOf(y);if(cool[p]>0||ended)return;cool[p]=.55;balls.push({x:px[p],y:py(p)+(p?30:-30),vy:p?520:-520,p});beep(400,.04);},
@@ -176,7 +176,7 @@ def('yazy','Yazy classic','🎲','#a0522d',()=>{
 def('cuppong','Cup pong','🥤','#1f7a5c',()=>{
   let cups,turn=0,shots=0,ball=null,sc=[0,0],msg='',msgT=0;const R=22;
   function rack(p){const out=[],by=p==1?H*.16:H*.84,dir=p==1?1:-1;let k=0;for(let row=0;row<3;row++)for(let j=0;j<=row;j++)out.push({x:W/2+(j-row/2)*R*2.1,y:by+dir*row*R*1.85,in:true});return out;}
-  return{
+  return{score:()=>sc,
     init(){cups=[rack(0),rack(1)];},
     update(dt){if(msgT>0)msgT-=dt;if(!ball)return;ball.t+=dt/.7;if(ball.t>=1){const tgt=cups[1-ball.p];let hit=null;for(const c of tgt)if(c.in&&Math.hypot(c.x-ball.tx,c.y-ball.ty)<R*.95)hit=c;
         if(hit){hit.in=false;sc[ball.p]++;msg='¡Dentro!';beep(900,.15,'triangle',.1);buzz(50);}else{msg='Fallo';beep(200,.1);}msgT=.8;ball=null;shots++;

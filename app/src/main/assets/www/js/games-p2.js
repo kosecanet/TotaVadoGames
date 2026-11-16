@@ -225,7 +225,7 @@ def('tilematch','Toca empareja','🍉','#e0574f',()=>{
 /* ---- TARGET PRACTICE ---- */
 def('target','Target practice','🎯','#2e8b3d',()=>{
   let tg=[[],[]],sc=[0,0],t=0,next=0,rng;const TL=30;
-  return{
+  return{score:()=>sc,
     init(){rng=seeded(ri(1,1e9));},
     update(dt){t+=dt;next-=dt;if(next<=0){next=.5+rng()*.5;const y=H*(.56+rng()*.34),dir=rng()<.5?1:-1,sp=80+rng()*120,life=2.2;for(let p=0;p<2;p++)tg[p].push({x:dir>0?-30:W+30,y,dir,sp,life,r:28});}
       for(const a of tg)for(const q of a){q.x+=q.dir*q.sp*dt;q.life-=dt;}for(let p=0;p<2;p++)tg[p]=tg[p].filter(q=>q.life>0&&!q.hit);

@@ -85,7 +85,7 @@ def('shipbattle','Batalla naval','⛵','#1e4d7a',()=>{
 def('sashimi','El último sashimi','🍣','#e04a3f',()=>{
   let it=[],sc=[0,0],lock=[0,0],R,wait=0;const PTS=5,DEC=['🍤','🍙','🥟','🍥','🍡'];
   function round(){it=[{e:'🍣',s:true}];for(let i=0;i<4;i++)it.push({e:pick(DEC)});const sp=140+(sc[0]+sc[1])*25;it.forEach(o=>{const a=rnd(0,6);o.x=W/2+rnd(-R*.5,R*.5);o.y=H/2+rnd(-R*.5,R*.5);o.vx=Math.cos(a)*sp;o.vy=Math.sin(a)*sp;});}
-  return{
+  return{score:()=>sc,
     init(){R=Math.min(W,H)*.42;round();},
     update(dt){lock[0]-=dt;lock[1]-=dt;if(wait>0){wait-=dt;if(wait<=0)round();return;}for(const o of it){o.x+=o.vx*dt;o.y+=o.vy*dt;const dx=o.x-W/2,dy=o.y-H/2,d=Math.hypot(dx,dy);if(d>R-24){const nx=dx/d,ny=dy/d,vn=o.vx*nx+o.vy*ny;o.vx-=2*vn*nx;o.vy-=2*vn*ny;o.x=W/2+nx*(R-24);o.y=H/2+ny*(R-24);}}},
     down(id,x,y,live){if(!live||wait>0)return;const p=sideOf(y);if(lock[p]>0)return;let best=null,bd=40;for(const o of it){const d=Math.hypot(o.x-x,o.y-y);if(d<bd){bd=d;best=o;}}if(!best)return;
@@ -116,7 +116,7 @@ def('minisoccer','Minifútbol','⚽','#3a9d3e',()=>{
 /* ---- BAMBÚ SHURIKEN ---- */
 def('bamboo','Bambú shuriken','🎋','#8a5a2b',()=>{
   let st=[],sh=[],sc=[0,0],t=0,next=0,cool=[0,0];const TL=30;
-  return{
+  return{score:()=>sc,
     update(dt){t+=dt;cool[0]-=dt;cool[1]-=dt;next-=dt;if(next<=0){next=rnd(.4,.9);st.push({x:rnd(30,W-30),h:0,grow:rnd(60,120),life:2.5});}
       for(const s of st){s.h=Math.min(H*.14,s.h+s.grow*dt);s.life-=dt;}st=st.filter(s=>s.life>0&&!s.cut);
       for(const k of sh){k.x+=k.vx*dt;k.y+=k.vy*dt;k.r+=dt*20;for(const s of st)if(!s.cut&&Math.abs(k.x-s.x)<12&&Math.abs(k.y-H/2)<s.h){s.cut=true;k.gone=true;sc[k.p]++;beep(1000,.05,'square',.06);}}
@@ -133,7 +133,7 @@ def('bamboo','Bambú shuriken','🎋','#8a5a2b',()=>{
 def('crabvolley','Vóley cangrejo','🦀','#f2b134',()=>{
   let cr,ball,sc=[0,0],wait=1,serve=0,netH;const GR=650,PTS=5;
   function srv(){ball={x:W*.75,y:serve==0?H*.75:H*.25,vx:0,vy:0,r:16};wait=.8;}
-  return{
+  return{score:()=>sc,
     init(){netH=W*.32;cr=[{y:H*.75,ty:H*.75,x:24,vx:0},{y:H*.25,ty:H*.25,x:24,vx:0}];srv();},
     down(id,x,y){const p=sideOf(y);cr[p].ty=p==0?clamp(y,H/2+30,H-30):clamp(y,30,H/2-30);if(cr[p].x<=26)cr[p].vx=520;},
     move(id,x,y){const p=sideOf(y);cr[p].ty=p==0?clamp(y,H/2+30,H-30):clamp(y,30,H/2-30);},
@@ -152,8 +152,8 @@ def('crabvolley','Vóley cangrejo','🦀','#f2b134',()=>{
 /* ---- PESCA INJUSTA ---- */
 def('fishing','Pesca injusta','🎣','#1d5fae',()=>{
   let fish=[],hooks,sc=[0,0],t=0,held=new Map();const TL=45,MAX=H*.42;
-  const FT=[['🐟',1],['🐠',2],['🐡',3],['🦑',4],['👢',-1]];
-  return{
+  const FT=[['🐟',1],['🐠',2],['🐡',3],['🦑',4],['👢',-1],['🪼',0]];
+  return{score:()=>sc,
     init(){hooks=[0,1].map(()=>({x:W/2,len:0,fish:null}));},
     down(id,x,y,live){if(!live)return;const p=sideOf(y);held.set(id,p);hooks[p].x=x;},move(id,x,y){const p=held.get(id);if(p!=null&&!hooks[p].len)hooks[p].x=x;},up(id){held.delete(id);},
     update(dt){t+=dt;if(fish.length<9&&Math.random()<dt*2){const k=pick(FT),dir=Math.random()<.5?1:-1;fish.push({e:k[0],v:k[1],x:dir>0?-30:W+30,y:H/2+rnd(-H*.3,H*.3),dir,sp:rnd(50,140)});}
@@ -162,9 +162,9 @@ def('fishing','Pesca injusta','🎣','#1d5fae',()=>{
         if(!h.fish)for(const f of fish)if(!f.on&&Math.abs(f.x-h.x)<22&&Math.abs(f.y-hy)<18){h.fish=f;f.on=true;beep(700,.05);break;}
         if(h.fish){h.fish.x=h.x;h.fish.y=hy+(p==0?14:-14);if(h.len<=0){sc[p]=Math.max(0,sc[p]+h.fish.v);beep(h.fish.v>0?1000:150,.12,'triangle',.08);fish.splice(fish.indexOf(h.fish),1);h.fish=null;}}});
       if(t>=TL)endRound(sc[0]==sc[1]?-1:sc[0]>sc[1]?0:1,`${sc[0]} – ${sc[1]} puntos`);},
-    draw(){ctx.fillStyle='#1e6bb8';ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,.06)';for(let y=0;y<H;y+=60)ctx.fillRect(0,y,W,30);
+    draw(){ctx.fillStyle='#6a58b8';ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,.05)';for(let y=0;y<H;y+=60)ctx.fillRect(0,y,W,30);
       for(const f of fish)E(f.e,f.x,f.y,34,f.dir<0&&!f.on?0:0);
-      hooks.forEach((h,p)=>{const y0=p==0?H:0,hy=p==0?H-h.len:h.len;ctx.strokeStyle='#eee';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(h.x,y0);ctx.lineTo(h.x,hy);ctx.stroke();ctx.strokeStyle=COL[p];ctx.lineWidth=4;ctx.beginPath();ctx.arc(h.x+(p?-6:6),hy+(p?-4:4),7,p?Math.PI:0,p?Math.PI*2:Math.PI);ctx.stroke();});
+      hooks.forEach((h,p)=>{const y0=p==0?H:0,hy=p==0?H-h.len:h.len;ctx.strokeStyle=INK;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(h.x,y0);ctx.lineTo(h.x,hy);ctx.stroke();ctx.strokeStyle=COL[p];ctx.lineWidth=4;ctx.beginPath();ctx.arc(h.x+(p?-6:6),hy+(p?-4:4),7,p?Math.PI:0,p?Math.PI*2:Math.PI);ctx.stroke();});
       for(let p=0;p<2;p++)inHalf(p,()=>{TS(String(sc[p]),36,H-30,30,COL[p]);TS(`⏱ ${Math.ceil(Math.max(0,TL-t))}`,W-44,H-30,20,'#fff');T('Mantén para bajar el anzuelo · ¡ojo con la bota!',W/2,H-10,13,'rgba(255,255,255,.8)');});}
   };
 },{help:'Pesca peces de más valor'});
@@ -191,7 +191,7 @@ def('guard','Guarda y ladrón','🔦','#2c2f3a',()=>{
 /* ---- BATALLA DE RANAS ---- */
 def('frogs','Batalla de ranas','🐸','#2e8bc0',()=>{
   let fl=[],fr,sc=[0,0],t=0;const PTS=10,MAXL=()=>H*.48;
-  return{
+  return{score:()=>sc,
     init(){fr=[0,1].map(p=>({ang:0,tongue:0,ext:0,st:0,ph:p*1.3}));for(let i=0;i<6;i++)fl.push({x:rnd(30,W-30),y:rnd(H*.2,H*.8),a:rnd(0,6)});},
     down(id,x,y,live){if(!live)return;const f=fr[sideOf(y)];if(f.st==0){f.st=1;beep(400,.04);}},
     update(dt){t+=dt;for(const q of fl){q.a+=rnd(-3,3)*dt;q.x+=Math.cos(q.a)*90*dt;q.y+=Math.sin(q.a)*90*dt;if(q.x<20||q.x>W-20)q.a=Math.PI-q.a;if(q.y<H*.12||q.y>H*.88)q.a=-q.a;q.x=clamp(q.x,20,W-20);q.y=clamp(q.y,H*.12,H*.88);}
@@ -252,7 +252,7 @@ def('bomber','Festival explosivo','🧨','#211c3a',()=>{
 def('disco','Batalla disco','🕺','#2a1d3a',()=>{
   let notes=[],t=0,sc=[0,0],combo=[0,0],fb=[[],[]];const TL=30,SP=260,AR=['◀','▼','▲','▶'];
   const lx=i=>W*(.14+i*.24),hitY=()=>H-110;
-  return{
+  return{score:()=>sc,
     init(){const r=seeded(ri(1,1e9));let tt=1.5;while(tt<TL-1){notes.push({t:tt,l:Math.floor(r()*4),hit:[false,false]});tt+=.35+r()*.45;}},
     down(id,x,y,live){if(!live)return;const p=sideOf(y),l=local(p,x,y);if(l.y<hitY()-60)return;const lane=clamp(Math.floor((l.x-W*.02)/(W*.24)),0,3);
       let best=null,bd=1e9;for(const n of notes){if(n.hit[p]||n.l!=lane)continue;const y2=hitY()-(n.t-t)*SP,d=Math.abs(y2-hitY());if(d<bd){bd=d;best=n;}}
