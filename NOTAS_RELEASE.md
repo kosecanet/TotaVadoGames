@@ -1,3 +1,3 @@
 # Cambios de esta versión
 
-_(sin cambios pendientes todavía)_
+- Las versiones se vuelven a publicar automáticamente con cada cambio.
