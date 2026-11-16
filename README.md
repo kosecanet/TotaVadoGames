@@ -4,9 +4,16 @@ Juegos para 2 jugadores en el mismo móvil, **sin anuncios** y sin internet.
 Azul juega abajo, Rojo juega arriba.
 
 ## Juegos
-Tres en raya · Conecta 4 · Air Hockey · Ping Pong · Serpientes · Tira y afloja ·
-Duelo del Oeste · Duelo matemático · Hipopótamos · Carrera de tortugas · Sumo de discos ·
-y modo **Campeonato** (5 juegos al azar).
+31 juegos para 2 (y más en camino): Batalla de pintura, Dedos rápidos, Tanques, Fútbol chapas, Encuentra la pareja,
+Ajedrez, Damas, Batalla naval, Tragabolas, Tres en raya, 4 en raya, Tres en raya total, Pimpón, Tira de la cuerda,
+Lanzacuchillos, Penaltis, Serpientes, Coches de carreras, Golpe de mano, Memoria, Billar, Piedra papel o tijera, Sumo,
+Hockey de aire, Dardos, Recogestrellas, Mazatopos, Carrera de reflejos, Duelo del Oeste, Duelo matemático y Carrera de tortugas.
+Modo **Jugar torneo** (5 juegos al azar) y marcador total Rojo/Azul.
+
+## Autoactualización
+Al abrir la app mira la última Release de este repo. Con wifi descarga la versión nueva sola y muestra
+"Versión lista · Instalar" en el menú (Android pide confirmar la instalación). El repo debe ser **público**
+para que la app pueda consultar las Releases sin contraseña.
 
 ## Compilar con GitHub
 1. Sube **todo** el contenido de esta carpeta a un repositorio (incluida la carpeta oculta `.github`).

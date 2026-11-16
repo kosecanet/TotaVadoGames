@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -16,6 +17,18 @@ import android.webkit.WebViewClient;
 public class MainActivity extends Activity {
 
     private WebView web;
+    private Updater updater;
+    private boolean pageReady = false;
+
+    /** Métodos que la página puede llamar: TVNative.download() / TVNative.install() */
+    public class Bridge {
+        @JavascriptInterface public void download() { updater.download(); }
+        @JavascriptInterface public void install() { updater.install(); }
+    }
+
+    void runJs(String js) {
+        runOnUiThread(() -> { if (pageReady) web.evaluateJavascript(js, null); });
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -33,7 +46,11 @@ public class MainActivity extends Activity {
         s.setSupportZoom(false);
         s.setBuiltInZoomControls(false);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        web.setWebViewClient(new WebViewClient());
+        updater = new Updater(this);
+        web.addJavascriptInterface(new Bridge(), "TVNative");
+        web.setWebViewClient(new WebViewClient() {
+            @Override public void onPageFinished(WebView v, String u) { pageReady = true; updater.push(); }
+        });
         web.setWebChromeClient(new WebChromeClient());
         setContentView(web);
 
@@ -43,6 +60,7 @@ public class MainActivity extends Activity {
             web.loadUrl("file:///android_asset/www/index.html");
         }
         hideSystemBars();
+        updater.check();
     }
 
     @SuppressWarnings("deprecation")
