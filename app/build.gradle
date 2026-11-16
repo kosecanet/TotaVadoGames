@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+// En GitHub Actions el número de versión sube solo con cada compilación
+def runNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
+
+android {
+    namespace 'com.totavado.games'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.totavado.games"
+        minSdk 24
+        targetSdk 35
+        versionCode runNumber
+        versionName "1.0.${runNumber}"
+    }
+
+    signingConfigs {
+        release {
+            // Si defines los secrets en GitHub se usan; si no, la clave incluida en el repo
+            def ksPath = System.getenv("TV_KEYSTORE_PATH")
+            storeFile ksPath ? file(ksPath) : file("totavado.jks")
+            storePassword System.getenv("TV_KEYSTORE_PASSWORD") ?: "totavado"
+            keyAlias System.getenv("TV_KEY_ALIAS") ?: "totavado"
+            keyPassword System.getenv("TV_KEY_PASSWORD") ?: "totavado"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
