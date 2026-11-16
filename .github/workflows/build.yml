@@ -21,7 +21,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest ya trae el SDK de Android (ANDROID_HOME)
 
       # Opcional: si creas el secret TV_KEYSTORE_BASE64 (y sus contraseñas) se firma con tu propia clave
       - name: Preparar clave de firma propia (opcional)
