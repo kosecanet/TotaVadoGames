@@ -91,7 +91,7 @@ def('tanks','Tanques','💥','#e8a93a',()=>{
 },{help:'Mantén MOVER · suelta para girar'});
 
 /* COCHES DE CARRERAS (circuito tipo Scalextric) */
-def('cars','Coches de carreras','🏎️','#3d8b3d',()=>{
+def('cars','Slot cars','🏎️','#3d8b3d',()=>{
   let cx,cy,Ls,Rm,cars,held=new Map(),done=false;const LAPS=4;
   const lane=p=>Rm+(p==0?20:-20);
   const per=r=>4*Ls+2*Math.PI*r;
@@ -120,7 +120,7 @@ def('cars','Coches de carreras','🏎️','#3d8b3d',()=>{
 },{help:'Mantén = acelerar · cuidado en curvas'});
 
 /* DARDOS */
-def('darts','Dardos','🎯','#b5543a',()=>{
+def('darts','Darts','🎯','#b5543a',()=>{
   const NUM=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
   let R,cx,cy,turn=0,thrown=0,round=0,sc=[0,0],darts=[],t=0,lock=0,lastPts=null;const ROUNDS=3;
   function score(x,y){const dx=x-cx,dy=y-cy,d=Math.hypot(dx,dy)/R;if(d>1)return 0;if(d<.07)return 50;if(d<.15)return 25;let a=Math.atan2(dx,-dy)*180/Math.PI;a=(a+360+9)%360;const n=NUM[Math.floor(a/18)%20];if(d>.55&&d<.63)return n*3;if(d>.92)return n*2;return n;}
@@ -146,7 +146,7 @@ def('darts','Dardos','🎯','#b5543a',()=>{
 },{cd:false});
 
 /* CARRERA DE REFLEJOS: encuentra el objeto antes que el otro */
-def('reflex','Carrera de reflejos','👀','#43305e',()=>{
+def('reflex','Reflex race','👀','#43305e',()=>{
   const POOL=['📘','🍾','⛄','🛋️','🎸','🍕','🚲','🌵','🎩','🍌','🐙','⚓','🔑','🎁','🧲','🦆','🧦','⏰'];
   let items,lay=[[],[]],target,sc=[0,0],lock=[0,0],wait=0,win=-1,c;const PTS=5,N=8;
   function nq(){items=shuffle(POOL.slice()).slice(0,N);target=pick(items);for(let p=0;p<2;p++)lay[p]=shuffle(items.slice());lock=[0,0];win=-1;}
@@ -236,7 +236,7 @@ def('knife','Lanzacuchillos','🔪','#2f4157',()=>{
 },{cd:false});
 
 /* ENCUENTRA LA PAREJA (estilo Dobble) */
-def('findmatch','Encuentra la pareja','🔍','#e85b52',()=>{
+def('findmatch','Find match','🔍','#e85b52',()=>{
   const POOL=['🍎','🐶','⭐','🚗','🎈','🍦','🐸','⚽','🌙','🔥','🎵','🍄','🐟','🌈','🍓','🦋','✏️','🔔','🧀','🐢','☂️','🍉','🚀','🎲','🐝','🍋','💡','🦄','🌻','🍪'];
   let plates=[[],[]],common,sc=[0,0],lock=[0,0],wait=0,win=-1,Rp;const PTS=5;
   function nq(){const s=shuffle(POOL.slice());common=s[0];const sets=[[common,...s.slice(1,6)],[common,...s.slice(6,11)]];

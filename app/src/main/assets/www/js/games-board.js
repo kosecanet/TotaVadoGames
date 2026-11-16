@@ -119,7 +119,7 @@ def('chess','Ajedrez','♞','#e7b43a',()=>{
 },{cd:false});
 
 /* BATALLA NAVAL */
-def('naval','Batalla naval','🚢','#264b73',()=>{
+def('naval','Sea battle','🚢','#264b73',()=>{
   const N=7,SHIPS=[4,3,3,2,2];let fleet=[[],[]],shots=[[],[]],turn=0,wait=0,gs,cell,gx,gy,flash=null;
   function place(){const g=Array(N*N).fill(-1);SHIPS.forEach((len,id)=>{for(;;){const h=Math.random()<.5,r=ri(0,h?N-1:N-len),c=ri(0,h?N-len:N-1);const cells=[];for(let k=0;k<len;k++)cells.push(h?r*N+c+k:(r+k)*N+c);if(cells.every(i=>g[i]<0)){cells.forEach(i=>g[i]=id);break;}}});return g;}
   const geo=()=>{gs=Math.min(W*.88,H*.38);cell=gs/N;gx=W/2-gs/2;gy=H*.56;};
@@ -208,7 +208,7 @@ def('pool','Billar','🎱','#0f86c4',()=>{
 },{cd:false});
 
 /* FÚTBOL CHAPAS */
-def('soccer','Fútbol chapas','🥅','#45a83f',()=>{
+def('soccer','Soccer pool','🥅','#45a83f',()=>{
   let ds,ball,turn=0,aim=null,moving=false,sc=[0,0],gw,y0,y1,r,br,msgT=0;const PTS=3;
   function reset(){r=W*.07;br=W*.042;ds=[];[[.3,.7],[.7,.7],[.5,.84]].forEach(([fx,fy])=>{ds.push({x:W*fx,y:H*fy,vx:0,vy:0,r,m:2,p:0});ds.push({x:W*(1-fx),y:H*(1-fy),vx:0,vy:0,r,m:2,p:1});});ball={x:W/2,y:H/2,vx:0,vy:0,r:br,m:1,ball:true};}
   const all=()=>ds.concat([ball]);
@@ -239,7 +239,7 @@ def('soccer','Fútbol chapas','🥅','#45a83f',()=>{
 },{cd:false});
 
 /* TRES EN RAYA DEFINITIVO (9 tableros) */
-def('uttt','Tres en raya total','#️⃣','#33506e',()=>{
+def('uttt','Ultimate tic tac toe','#️⃣','#33506e',()=>{
   const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   let b,sw,turn=0,active=-1,s,ox,oy;
   const geo=()=>{s=Math.min(W*.96,H*.58);ox=(W-s)/2;oy=(H-s)/2;};

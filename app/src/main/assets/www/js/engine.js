@@ -77,15 +77,15 @@ function loop(t){
   requestAnimationFrame(loop);const dt=Math.min(.033,Math.max(0,(t-last)/1000));last=t;if(!G)return;
   if(!paused&&!ended){if(cdT>0){const b=Math.ceil(cdT);cdT-=dt;if(cdT<=0)beep(990,.18,'square',.06);else if(Math.ceil(cdT)<b)beep(520,.08,'square',.05);}else G.update&&G.update(dt);}
   ctx.save();G.draw();ctx.restore();
-  if(cdT>0&&!ended){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W,H);const n=String(Math.ceil(cdT));TP(0,n,H*.72,110,'#fff');TP(1,n,H*.72,110,'#fff');
-    if(G.def.help)for(let p=0;p<2;p++)TP(p,G.def.help,H*.88,19,'#ffe066');}
+  if(cdT>0&&!ended){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W,H);const n=String(Math.ceil(cdT)),np=G.def.solo?1:2;for(let p=0;p<np;p++){TP(p,n,H*.72,110,'#fff');if(G.def.help)TP(p,G.def.help,H*.88,19,'#ffe066');}}
 }
 requestAnimationFrame(loop);
 
-const ptrs=new Set();
-cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}ptrs.add(e.pointerId);if(G&&!paused&&!ended&&G.down)G.down(e.pointerId,e.clientX,e.clientY,cdT<=0);});
+const ptrs=new Set(),pinfo=new Map();
+cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(_){}ptrs.add(e.pointerId);pinfo.set(e.pointerId,{x:e.clientX,y:e.clientY,t:performance.now()});if(G&&!paused&&!ended&&G.down)G.down(e.pointerId,e.clientX,e.clientY,cdT<=0);});
 cv.addEventListener('pointermove',e=>{if(G&&!paused&&!ended&&G.move&&ptrs.has(e.pointerId))G.move(e.pointerId,e.clientX,e.clientY);});
-const upH=e=>{ptrs.delete(e.pointerId);if(G&&G.up&&!paused)G.up(e.pointerId,e.clientX,e.clientY);};
+const upH=e=>{ptrs.delete(e.pointerId);const i=pinfo.get(e.pointerId)||{x:e.clientX,y:e.clientY,t:performance.now()};pinfo.delete(e.pointerId);
+  if(G&&G.up&&!paused&&!ended)G.up(e.pointerId,e.clientX,e.clientY,{sx:i.x,sy:i.y,dx:e.clientX-i.x,dy:e.clientY-i.y,ms:performance.now()-i.t});};
 cv.addEventListener('pointerup',upH);cv.addEventListener('pointercancel',upH);
 document.addEventListener('contextmenu',e=>e.preventDefault());
 
@@ -110,8 +110,19 @@ function endRound(w,msg){
   }else{if(w>=0)wins[w]++;
     setTimeout(()=>showOver(w,msg,`Azul ${wins[0]} – ${wins[1]} Rojo`,[{t:'Revancha',fn:()=>start(G.def.id)},{t:'Menú',fn:toMenu}]),500);}
 }
-function champStart(){const ids=shuffle(GAMES.map(g=>g.id)).slice(0,5);champ={list:ids,idx:0,pts:[0,0]};start(ids[0]);}
+function champStart(){const ids=shuffle(GAMES.filter(g=>!g.solo).map(g=>g.id)).slice(0,5);champ={list:ids,idx:0,pts:[0,0]};start(ids[0]);}
 function champEnd(){const p=champ.pts,w=p[0]==p[1]?-1:p[0]>p[1]?0:1;
   const titles=w<0?['🤝 ¡Empate!','🤝 ¡Empate!']:[w==0?'🏆 ¡CAMPEÓN!':'Rojo es el campeón',w==1?'🏆 ¡CAMPEÓN!':'Azul es el campeón'];
   showOver(w,'Final del torneo',`Azul ${p[0]} – ${p[1]} Rojo`,[{t:'Otro torneo',fn:champStart},{t:'Menú',fn:toMenu}],titles);}
 function refreshScores(){$('#scB').textContent=TOT[0];$('#scR').textContent=TOT[1];}
+
+/* Juegos de 1 jugador */
+function endSolo(ok,msg){if(ended||!G)return;ended=true;beep(ok?784:200,.3,'triangle',.08);buzz(ok?[40,40,40]:120);
+  setTimeout(()=>{ovActions=[{t:ok?'Siguiente':'Otra vez',fn:()=>start(G.def.id)},{t:'Menú',fn:toMenu}];$('#ovTop').innerHTML='';
+    $('#ovBot').innerHTML=halfHTML(ok?'¡Conseguido!':'¡Fin de la partida!',ok?'#7CFC9A':'#fff',msg,'',ovActions);$('#over').style.display='flex';},500);}
+/* Utilidades geométricas y aleatorio con semilla (para que las dos mitades vean lo mismo) */
+function segPt(px,py,ax,ay,bx,by){const vx=bx-ax,vy=by-ay,l2=vx*vx+vy*vy||1;let t=((px-ax)*vx+(py-ay)*vy)/l2;t=clamp(t,0,1);const cx=ax+vx*t,cy=ay+vy*t;return{d:Math.hypot(px-cx,py-cy),x:cx,y:cy,t};}
+function seeded(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+function swipeDir(i){if(Math.hypot(i.dx,i.dy)<25)return null;return Math.abs(i.dx)>Math.abs(i.dy)?(i.dx>0?'R':'L'):(i.dy>0?'D':'U');}
+function bar(x,y,w,h,f,c){ctx.fillStyle='rgba(0,0,0,.35)';rrect(x,y,w,h,h/2);ctx.fill();ctx.fillStyle=c;rrect(x,y,Math.max(h,w*clamp(f,0,1)),h,h/2);ctx.fill();}
+function hearts(n,x,y,s){for(let i=0;i<n;i++)E('❤️',x+i*s*1.1,y,s);}

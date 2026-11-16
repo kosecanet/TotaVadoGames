@@ -1,13 +1,18 @@
 "use strict";
 /* Menú principal, ajustes y botón Atrás */
-const ORDER=['paint','fast','tanks','soccer','findmatch','chess','checkers','naval','hippo','ttt','c4','uttt',
-  'pong','tug','knife','penalty','snake','cars','slap','memory','pool','rps','sumo','hockey','darts','stars','mole',
-  'reflex','duel','math','turtle'];
-const NEW=new Set([]);
+const ORDER=['oops','guessperson','guessanimal','triple','golf','uttt','crash','reflex','throw','yazy','cuppong','mazepaint',
+  'fruit','wheelie','findmatch','snakes1','nuts','brainrot','ballrun','cars','archery','animalstack','stampede','tilematch',
+  'target','gravity','golffoot','brick','blocks','darts','tennis','cannon','ludo','solitaire','backgammon','soccer',
+  'penalty','snake','looter','pinball','race','tanks','hippo','sudoku','numbers','ttt','c4','traffic',
+  'slap','memory','pool','rps','sumo','hockey','naval','pong','slide','tops','knife','tug',
+  'basket','swords','chess','minigolf','shipbattle','sashimi','stars','minisoccer','mole','bamboo','checkers','crabvolley',
+  'paint','fishing','fast','guard','frogs','robots','bomber','bowduel','disco','icepeaks','siege','bowling',
+  'duel','math','turtle'];
+const NEW=new Set(['oops','guessanimal']);
 GAMES.sort((a,b)=>{const ia=ORDER.indexOf(a.id),ib=ORDER.indexOf(b.id);return(ia<0?999:ia)-(ib<0?999:ib);});
 
 function shade(hex,f){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;r=Math.round(r*(1+f));g=Math.round(g*(1+f));b=Math.round(b*(1+f));return`rgb(${clamp(r,0,255)},${clamp(g,0,255)},${clamp(b,0,255)})`;}
-$('#grid').innerHTML=GAMES.map(g=>`<div class="tile" data-id="${g.id}" style="--c:${g.color};--b:${shade(g.color,-.45)}"><div class="band"></div><div class="ic">${g.emoji}</div>${NEW.has(g.id)?'<div class="new">¡NUEVO!</div>':''}<div class="t">${g.name}</div></div>`).join('');
+$('#grid').innerHTML=GAMES.map(g=>`<div class="tile" data-id="${g.id}" style="--c:${g.color};--b:${shade(g.color,-.45)}"><div class="band"></div><div class="ic">${g.emoji}</div>${g.solo?'<div class="solo">1P</div>':''}${NEW.has(g.id)?'<div class="new">¡NUEVO!</div>':''}<div class="t">${g.name}</div></div>`).join('');
 $('#grid').addEventListener('click',e=>{const c=e.target.closest('.tile');if(c){wins=[0,0];champ=null;start(c.dataset.id);}});
 $('#tourBtn').addEventListener('click',champStart);
 $('#nGames').textContent=GAMES.length;

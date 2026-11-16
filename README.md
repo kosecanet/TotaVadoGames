@@ -4,11 +4,10 @@ Juegos para 2 jugadores en el mismo móvil, **sin anuncios** y sin internet.
 Azul juega abajo, Rojo juega arriba.
 
 ## Juegos
-31 juegos para 2 (y más en camino): Batalla de pintura, Dedos rápidos, Tanques, Fútbol chapas, Encuentra la pareja,
-Ajedrez, Damas, Batalla naval, Tragabolas, Tres en raya, 4 en raya, Tres en raya total, Pimpón, Tira de la cuerda,
-Lanzacuchillos, Penaltis, Serpientes, Coches de carreras, Golpe de mano, Memoria, Billar, Piedra papel o tijera, Sumo,
-Hockey de aire, Dardos, Recogestrellas, Mazatopos, Carrera de reflejos, Duelo del Oeste, Duelo matemático y Carrera de tortugas.
-Modo **Jugar torneo** (5 juegos al azar) y marcador total Rojo/Azul.
+87 juegos (84 en el mismo orden que la app original + 3 extra), 11 de ellos para 1 jugador (marcados con **1P**).
+Modo **Jugar torneo** (5 juegos al azar para 2) y marcador total Rojo/Azul.
+
+Código de los juegos: `app/src/main/assets/www/js/games-*.js` · orden del menú: `js/menu.js` (ORDER).
 
 ## Autoactualización
 Al abrir la app mira la última Release de este repo. Con wifi descarga la versión nueva sola y muestra
